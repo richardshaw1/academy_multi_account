@@ -16,7 +16,7 @@ resource "aws_ram_resource_share" "env_ram_share" {
 
 resource "aws_ram_resource_association" "env_ram_res_asoct" {
   count              = var.create_tgw ? 1 : 0
-  resource_arn       = aws_ec2_transit_gateway.mobilise_academy_tgw[0].arn
+  resource_arn       = aws_ec2_transit_gateway.env_tgw[0].arn
   resource_share_arn = aws_ram_resource_share.env_ram_share[0].arn
 }
 
