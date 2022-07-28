@@ -86,10 +86,10 @@ resource "aws_route_table" "service_rtbl" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 resource "aws_route" "service_to_ngw_internet_rt" {
-  count                  = (var.create_rtbl ? 1 : 0) * length(var.environment_azs)
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
+  count                  = (var.create_rtbl ? 1 : 0) * length(var.ngw_subnets)
+  route_table_id         = element(aws_route_table.env_rt_tbl.*.id, element(var.ngw_subnets, count.index))
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.env_ngw[count.index].id
+  nat_gateway_id         = aws_nat_gateway.env_ngw[0].id
 }
 # ----------------------------------------------------------------------------------------------------------------------
 # Route: direct all traffic to the Internet Gateway
