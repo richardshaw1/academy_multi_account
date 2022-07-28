@@ -27,20 +27,20 @@ variable "tgw_default_rtbl" {
 # ======================================================================================================================
 # RESOURCE CREATION
 # ======================================================================================================================
-data "aws_ec2_transit_gateway" "Mobilise_Academy_TGW" {
+/* data "aws_ec2_transit_gateway" "Mobilise_Academy_TGW" {
   count = var.create_tgw_atch ? 1 : 0
 
   filter {
     name   = "options.amazon-side-asn"
     values = [var.transit_gateway_asn]
   }
-}
+} */
 
 #  cross account transit gateway attachment
 resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
   count              = var.create_tgw_atch ? 1 : 0
   subnet_ids         = [for sn in var.tgw_atch_subnet_ids : aws_subnet.env_subnet[sn].id]
-  transit_gateway_id = data.aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
+  transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
   vpc_id             = aws_vpc.env_vpc[0].id
 
 

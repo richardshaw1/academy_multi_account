@@ -27,7 +27,7 @@ resource "aws_instance" "instance_standard" {
   private_ip                  = lookup(each.value, "private_ip", "")
   associate_public_ip_address = lookup(each.value, "associate_public_ip_address", false)
   key_name                    = lookup(each.value, "ec2_account_key_name")
-  vpc_security_group_ids      = compact(concat([for sg in lookup(each.value, "sg_names", []) : aws_security_group.ec2_sg[sg].id], [var.create_ithc_nsgs && contains(var.ithc_instances, each.key) == true ? aws_security_group.ithc_nsg_sg[0].id : ""], [var.create_ithc_mimic ? aws_security_group.ithc_mimic_sg[each.key].id : ""]))
+  vpc_security_group_ids      = lookup(each.value, "sg_names")
   iam_instance_profile        = lookup(each.value, "iam_instance_profile", "") == "" ? "" : "${lookup(each.value, "iam_instance_profile", "")}-iam-ip"
   disable_api_termination     = lookup(each.value, "disable_api_termination", null)
   monitoring                  = lookup(each.value, "monitoring", null)

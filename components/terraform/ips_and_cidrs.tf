@@ -5,6 +5,8 @@
 # LOCAL VARIABLES
 # ===================================================================================================================
 locals {
+  vpc_a_cidr                = "10.0.0.0/16"   # The CIDR range for VPC-A
+  vpc_b_cidr                = "10.1.0.0/16"   # The CIDR range for VPC-B
   vpc_a_squid_a_sn_cidr     = "10.0.0.0/27"   # The CIDR range for the VPC-A Public-subnet-01
   vpc_a_squid_b_sn_cidr     = "10.0.0.32/27"  # The CIDR range for the VPC-A public-subnet-02
   vpc_a_nat_sn_cidr         = "10.0.0.64/27"  # The CIDR range for the VPC-A public-subnet-(NAT)

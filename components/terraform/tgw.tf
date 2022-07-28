@@ -100,12 +100,6 @@ resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
   transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
 }
 
-resource "aws_ec2_transit_gateway_route" "tg" {
-  destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.Public_to_VPC_B[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
-}
-
 # ----------------------------------------------------------------------------------------------------------------------
 # The Local Transit Gateway VPC Attachment
 # ----------------------------------------------------------------------------------------------------------------------
@@ -114,12 +108,29 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "Public_to_VPC_B" {
   subnet_ids         = [for sn in var.tgw_local_vpc_att_sn_ids : aws_subnet.env_subnet[sn].id] 
   transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
   vpc_id             = aws_vpc.env_vpc[0].id
+
+  transit_gateway_default_route_table_propagation = true
+}
+resource "aws_ec2_transit_gateway_route" "tgw_local_vpc_route" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.Public_to_VPC_B[0].id
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
+}
+resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
+  destination_cidr_block         = "10.0.0.0/16"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.Public_to_VPC_B[0].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
 }
 
+resource "aws_ec2_transit_gateway_route" "tgw_to_account_a" {
+  destination_cidr_block         = "10.1.0.0/16"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.x_act_tg_atmt[0].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
+}
 # ----------------------------------------------------------------------------------------------------------------------
 # Transit Gateway Route Tables Routes
 # ----------------------------------------------------------------------------------------------------------------------
-data "aws_ec2_transit_gateway_vpc_attachment" "tgw_vpc_att" {
+/* data "aws_ec2_transit_gateway_vpc_attachment" "tgw_vpc_att" {
   for_each = var.tgw_vpc_attachments
   filter {
     name   = "vpc-id"
@@ -129,10 +140,5 @@ data "aws_ec2_transit_gateway_vpc_attachment" "tgw_vpc_att" {
     name   = "state"
     values = ["available"]
   }
-}
+} */
 
-resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
-  transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpc_attachment.tgw_vpc_att[lookup(each.value, "vpc_attachment", "")].id
-  destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[lookup(each.value, "tgw_route_table", "")].id
-}

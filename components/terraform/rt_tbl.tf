@@ -87,7 +87,7 @@ resource "aws_route_table" "service_rtbl" {
 
 resource "aws_route" "service_to_ngw_internet_rt" {
   count                  = (var.create_rtbl ? 1 : 0) * length(var.environment_azs)
-  route_table_id         = aws_route_table.service_rtbl[count.index].id
+  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.env_ngw[count.index].id
 }
@@ -105,10 +105,10 @@ resource "aws_route" "public_rt" {
 # Route: direct internal traffic to the VPC-A (account-A) via the transit gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route" "env_route_to_account_a" {
-  count                  = length(var.tgw_prod_subnets) * (var.get_tgw_id ? 1 : 0)
-  route_table_id         = element(aws_route_table.env_rt_tbl.*.id, element(var.tgw_prod_subnets, count.index))
-  destination_cidr_block = local.prod_acc_cidr
-  transit_gateway_id     = data.aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
+  count                  = length(var.tgw_account_b_subnets) * (var.get_tgw_id ? 1 : 0)
+  route_table_id         = "env_rt_tbl"
+  destination_cidr_block = local.vpc_a_cidr
+  transit_gateway_id     = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
   depends_on             = [aws_route_table.env_rt_tbl, aws_ec2_transit_gateway.Mobilise_Academy_TGW]
 }
 
