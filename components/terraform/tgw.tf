@@ -110,6 +110,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "Public_to_VPC_B" {
   vpc_id             = aws_vpc.env_vpc[0].id
 
   transit_gateway_default_route_table_propagation = true
+  transit_gateway_default_route_table_association = true
 }
 resource "aws_ec2_transit_gateway_route" "tgw_local_vpc_route" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.Public_to_VPC_B[0].id
@@ -127,18 +128,12 @@ resource "aws_ec2_transit_gateway_route" "tgw_to_account_a" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.x_act_tg_atmt[0].id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
 }
-# ----------------------------------------------------------------------------------------------------------------------
-# Transit Gateway Route Tables Routes
-# ----------------------------------------------------------------------------------------------------------------------
-/* data "aws_ec2_transit_gateway_vpc_attachment" "tgw_vpc_att" {
-  for_each = var.tgw_vpc_attachments
-  filter {
-    name   = "vpc-id"
-    values = [each.value]
-  }
-  filter {
-    name   = "state"
-    values = ["available"]
-  }
-} */
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Transit Gateway Route Table Associations & Propagations
+# ----------------------------------------------------------------------------------------------------------------------
+resource "aws_ec2_transit_gateway_route_table_association" "tgw_vpn_rt_assoc" {
+  for_each                       = var.vpn_connections
+  transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpn_attachment.env_tg_vpn_attmts[each.key].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.env_tgw_rtbl[lookup(each.value, "tgw_rt_tbl", "")].id
+}
