@@ -23,15 +23,3 @@ variable "tgw_default_rtbl" {
   description = "A flag whether the VPC Attachment should be associated and propagated with the EC2 Transit Gateway association default route table"
   default     = true
 }
-
-# ======================================================================================================================
-# RESOURCE CREATION
-# ======================================================================================================================
-/* data "aws_ec2_transit_gateway" "mobilise_academy_tgw" {
-  count = var.create_tgw_atch ? 1 : 0
-
-  filter {
-    name   = "options.amazon-side-asn"
-    values = [var.transit_gateway_asn]
-  }
-} */

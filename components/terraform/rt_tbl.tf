@@ -99,7 +99,7 @@ resource "aws_route" "public_rt" {
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.env_igw[0].id
-  depends_on             = ["aws_route_table.env_rt_tbl"]
+  depends_on             = [aws_route_table.env_rt_tbl]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------

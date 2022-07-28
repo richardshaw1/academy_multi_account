@@ -39,7 +39,7 @@ sgs = {
     "port"        = 22
     "description" = "SSH from Internet from my IP"
     "my_sg"       = "ssh_from_internet"
-    "cidr_blocks" = [" 86.142.13.136/32"]
+    "cidr_blocks" = ["86.142.13.136/32"]
 }
   # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_cidr - squid_sg
@@ -71,5 +71,4 @@ sgs = {
     "my_sg"       = "ssm_endpoint_sg"
     "cidr_blocks" = ["10.0.0.0/16"]
   }
-
 }
