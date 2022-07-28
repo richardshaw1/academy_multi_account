@@ -1,8 +1,11 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# Variables for EC2 instances, EBS Volumes, elastic IPs if required and IAM Instance profiles
+# ----------------------------------------------------------------------------------------------------------------------
 ec2s = {  
   "wordpress_01" = {
     create_instance             = true
     sg_names                    = ["wordpress_ec2_sg"]
-    ami                         = "ami-0bd2099338bc55e6d"
+    ami                         = "ami-034bbb7b632c2f16c"
     instance_type               = "t2.micro"
     iam_instance_profile        = ""
     subnet_number               = 0
@@ -20,7 +23,7 @@ ec2s = {
     "wordpress_02" = {
     create_instance             = true
     sg_names                    = ["wordpress_ec2_sg"]
-    ami                         = "ami-0bd2099338bc55e6d"
+    ami                         = "ami-034bbb7b632c2f16c"
     instance_type               = "t2.micro"
     iam_instance_profile        = ""
     subnet_number               = 1
