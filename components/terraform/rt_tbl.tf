@@ -50,7 +50,7 @@ variable "tgw_account_a_subnets" {
 # RESOURCE CREATION
 # ======================================================================================================================
 # ----------------------------------------------------------------------------------------------------------------------
-# Public subnet Route Tables (deployed in each AZ)
+# public subnet Route Tables (deployed in each AZ)
 # ----------------------------------------------------------------------------------------------------------------------
 
 resource "aws_route_table" "env_rt_tbl" {
@@ -86,19 +86,20 @@ resource "aws_route_table" "service_rtbl" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 resource "aws_route" "service_to_ngw_internet_rt" {
-  count                  = (var.create_rtbl ? 1 : 0) * length(var.environment_azs)
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
+  count                  = (var.create_rtbl ? 1 : 0) * length(var.ngw_subnets)
+  route_table_id         = element(aws_route_table.env_rt_tbl.*.id, element(var.ngw_subnets, count.index))
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.env_ngw[count.index].id
+  nat_gateway_id         = aws_nat_gateway.env_ngw[0].id
 }
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: direct all traffic to the Internet Gateway
+# Route: direct all internet traffic to the Internet Gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route" "public_rt" {
   count                  = length(var.igw_subnets)
-  route_table_id         = element(aws_route_table.env_rt_tbl.*.id, element(var.igw_subnets, count.index))
+  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.env_igw[0].id
+  depends_on             = ["aws_route_table.env_rt_tbl"]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -106,155 +107,8 @@ resource "aws_route" "public_rt" {
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route" "env_route_to_account_a" {
   count                  = length(var.tgw_account_b_subnets) * (var.get_tgw_id ? 1 : 0)
-  route_table_id         = "env_rt_tbl"
+  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = local.vpc_a_cidr
-  transit_gateway_id     = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  depends_on             = [aws_route_table.env_rt_tbl, aws_ec2_transit_gateway.Mobilise_Academy_TGW]
+  transit_gateway_id     = aws_ec2_transit_gateway.mobilise_academy_tgw[0].id
+  depends_on             = [aws_route_table.env_rt_tbl, aws_ec2_transit_gateway.mobilise_academy_tgw]
 }
-
-# ===================================================================================================================
-# Resource Creation
-# ===================================================================================================================
-# ===================================================================================================================
-# Route Tables
-# ===================================================================================================================
-# ----------------------------------------------------------------------------------------------------------------------
-# Account A Route Tables
-# ----------------------------------------------------------------------------------------------------------------------
-/* resource "aws_default_route_table" "r" {
-  count                  = var.create_vpc ? 1 : 0
-  default_route_table_id = aws_vpc.env_vpc[0].default_route_table_id
-
-  tags = merge(
-    local.default_tags,
-    {
-      "Name" = "${local.name_prefix}-main-rtbl"
-    },
-  )
-
-  lifecycle {
-    ignore_changes = [
-      tags["DeployedBy"], tags["Branch"], tags["InitDeployDate"]
-    ]
-  }
-}
-
-# Created on the premise that each subnet created will be assigned its own individual route table.
-resource "aws_route_table" "env_rt_tbl" {
-  count  = length(var.subnet_names)
-  vpc_id = aws_vpc.env_vpc[0].id
-
-  tags = merge(
-    local.default_tags,
-    {
-      "Name" = "${local.name_prefix}-${var.subnet_names[count.index]}-${substr(var.environment_azs[count.index], -1, -1)}-rtbl"
-    },
-  )
-
-  lifecycle {
-    ignore_changes = [
-      tags["DeployedBy"], tags["Branch"], tags["InitDeployDate"]
-    ]
-  }
-} */
-
-
-/* resource "aws_route_table" "subnet_01_rt" {
-  vpc_id = aws_vpc.env_vpc[0].id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.env_igw[0].id
-  }
-  route {
-    cidr_block         = "10.1.0.0/16"
-    transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  }
-
-  tags = {
-    Name  = "Public-Subnet-01-RT"
-    Owner = "MobiliseAcademy-rs"
-  }
-}
-
-resource "aws_route_table" "subnet_02_rt" {
-  vpc_id = aws_vpc.env_vpc[0].id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.env_igw[0].id
-  }
-  route {
-    cidr_block         = "10.1.0.0/16"
-    transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  }
-
-  tags = {
-    Name  = "Public-Subnet-02-RT"
-    Owner = "MobiliseAcademy-rs"
-  }
-}
-
-resource "aws_route_table" "tgw_a_rt" {
-  vpc_id = aws_vpc.env_vpc[0].id
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.env_ngw.id
-  }
-  route {
-    cidr_block         = "10.1.0.0/16"
-    transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  }
-
-  tags = {
-    Name  = "tgw-a-rt"
-    Owner = "MobiliseAcademy-rs"
-  }
-}
-
-resource "aws_route_table" "tgw_b_rt" {
-  vpc_id = aws_vpc.env_vpc[0].id
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.env_ngw[0].id
-  }
-  route {
-    cidr_block         = "10.1.0.0/16"
-    transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  }
-
-  tags = {
-    Name  = "tgw-b-rt"
-    Owner = "MobiliseAcademy-rs"
-  }
-}
-
-resource "aws_route_table" "nat_subnet_01_rt" {
-  vpc_id = aws_vpc.env_vpc[0].id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.env_igw[0].id
-  }
-  route {
-    cidr_block         = "10.1.0.0/16"
-    transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  }
-
-  tags = {
-    Name  = "nat-gw-01-rt"
-    Owner = "MobiliseAcademy-rs"
-  }
-} */
-
-
-# ===================================================================================================================
-# Routes
-# ===================================================================================================================
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: direct internal traffic to the account-B via the transit gateway
-# ----------------------------------------------------------------------------------------------------------------------
-/* resource "aws_route" "env_route_to_prod_svcs" {
-  count                  = length(var.tgw_prod_subnets) * (var.get_tgw_id ? 1 : 0)
-  route_table_id         = element(aws_route_table.env_rt_tbl.*.id, element(var.tgw_prod_subnets, count.index))
-  destination_cidr_block = local.prod_acc_cidr
-  transit_gateway_id     = data.aws_ec2_transit_gateway.main_transit_gateway[0].id
-  depends_on             = [aws_route_table.env_rt_tbl, aws_ec2_transit_gateway.env_tgw]
-} */

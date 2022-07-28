@@ -5,8 +5,8 @@ variable "account_no" {
 
 variable "owner" {
   type        = string
-  description = "The Owner of the environment e.g Mobilise"
-  default     = "Mobilise-Academy"
+  description = "The Owner of the environment e.g mobilise"
+  default     = "mobilise-academy"
 }
 
 variable "project" {
@@ -17,7 +17,7 @@ variable "project" {
 
 variable "client_abbr" {
   type        = string
-  description = "Abbreviated name of the client e.g Mobilise = 'mob'"
+  description = "Abbreviated name of the client e.g mobilise = 'mob'"
   default     = "Mob"
 }
 
@@ -75,7 +75,7 @@ locals {
   }
 
   # -------------------------------------------------------------------------------------------------------------------
-  # Standard List Tags for AWS Resources - used for Autoscaling Groups
+  # Standard List Tags for AWS Resources - used for Autoscaling groups
   # -------------------------------------------------------------------------------------------------------------------
 
   default_list_tags = [
@@ -91,7 +91,7 @@ locals {
   ]
 
   # -------------------------------------------------------------------------------------------------------------------
-  # Name prefix for all named resources which follows the Mobilise Cloud Handbook:
+  # Name prefix for all named resources which follows the mobilise Cloud Handbook:
   # example: mob-mgmt-jenkins-rtbl
   # -------------------------------------------------------------------------------------------------------------------
 

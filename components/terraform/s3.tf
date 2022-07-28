@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "assets" {
   bucket = "assets.rs.mobilise.academy"
 
   tags = {
-    Name    = "Mobilise-Academy"
+    Name    = "mobilise-academy"
     project = "Workshop"
   }
 }

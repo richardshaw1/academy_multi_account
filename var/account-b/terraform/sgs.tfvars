@@ -1,25 +1,25 @@
 # ===================================================================================================================
-# SECURITY GROUPS
+# SECURITY groupS
 # ===================================================================================================================
 sgs = {
   # ---------------------------------------- Instances ---------------------------------------------------------------
   "wordpress_ec2_sg" = {
     "ec2_sg_name_suffix" = "wordpress-ec2-sg"
-    "ec2_sg_description" = "Security Group for the WordPress EC2s"
+    "ec2_sg_description" = "Security group for the WordPress EC2s"
   }
   # ---------------------------------------- Non Instances -----------------------------------------------------------
   "wordpress_alb_sg" = {
     "ec2_sg_name_suffix" = "wordpress-alb-sg"
-    "ec2_sg_description" = "Security Group for the WordPress ALB"
+    "ec2_sg_description" = "Security group for the WordPress ALB"
   }
   "aurora_sg" = {
     "ec2_sg_name_suffix" = "aurora-sg"
-    "ec2_sg_description" = "Security Group for the Agresso nonprod web application load balancer 01"
+    "ec2_sg_description" = "Security group for the Agresso nonprod web application load balancer 01"
   }
   # -----------------------------------------------------------------------------------------------------------------
 }
 # ===================================================================================================================
-# SECURITY GROUP RULES
+# SECURITY group RULES
 # ===================================================================================================================
 # ###################################################################################################################
 # INBOUND - TCP, Single Port, CIDR range
@@ -64,7 +64,7 @@ inbound_rules_tcp_sp_cidr = {
     "my_sg"       = "wordpress_ec2_sg"
     "cidr_blocks" = ["10.1.0.32/27"]
   }
-    # -----------------------------------------------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_cidr - memcached_sg
   # -----------------------------------------------------------------------------------------------------------------
   "memcached_sg_11211_a" = {

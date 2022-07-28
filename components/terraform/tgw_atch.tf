@@ -27,7 +27,7 @@ variable "tgw_default_rtbl" {
 # ======================================================================================================================
 # RESOURCE CREATION
 # ======================================================================================================================
-/* data "aws_ec2_transit_gateway" "Mobilise_Academy_TGW" {
+/* data "aws_ec2_transit_gateway" "mobilise_academy_tgw" {
   count = var.create_tgw_atch ? 1 : 0
 
   filter {
@@ -35,17 +35,3 @@ variable "tgw_default_rtbl" {
     values = [var.transit_gateway_asn]
   }
 } */
-
-#  cross account transit gateway attachment
-resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
-  count              = var.create_tgw_atch ? 1 : 0
-  subnet_ids         = [for sn in var.tgw_atch_subnet_ids : aws_subnet.env_subnet[sn].id]
-  transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
-  vpc_id             = aws_vpc.env_vpc[0].id
-
-
-  transit_gateway_default_route_table_association = var.tgw_default_rtbl
-  transit_gateway_default_route_table_propagation = var.tgw_default_rtbl
-
-    depends_on = [aws_subnet.env_subnet]
-}

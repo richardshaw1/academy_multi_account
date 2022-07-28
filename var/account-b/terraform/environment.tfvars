@@ -5,5 +5,5 @@
 client_abbr = "Mob"
 account_no  = "226283484947"
 environment = "Account-B"
-owner       = "Mobilise"
+owner       = "mobilise"
 project     = "Workshop"

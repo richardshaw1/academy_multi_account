@@ -67,7 +67,7 @@ resource "aws_ram_resource_share" "env_ram_share" {
 
 resource "aws_ram_resource_association" "env_ram_res_asoct" {
   count              = var.create_tgw ? 1 : 0
-  resource_arn       = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].arn
+  resource_arn       = aws_ec2_transit_gateway.mobilise_academy_tgw[0].arn
   resource_share_arn = aws_ram_resource_share.env_ram_share[0].arn
 }
 
@@ -80,11 +80,15 @@ resource "aws_ram_principal_association" "ram_principal" {
 # ----------------------------------------------------------------------------------------------------------------------
 # Create Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ec2_transit_gateway" "Mobilise_Academy_TGW" {
-  count                          = var.create_tgw ? 1 : 0
-  description                    = "Mobilise-Academy-TGW"
-  amazon_side_asn                = var.transit_gateway_asn
-  auto_accept_shared_attachments = "enable"
+resource "aws_ec2_transit_gateway" "mobilise_academy_tgw" {
+  count                           = var.create_tgw ? 1 : 0
+  description                     = "mobilise-academy-tgw"
+  amazon_side_asn                 = var.transit_gateway_asn
+  auto_accept_shared_attachments  = "enable"
+  default_route_table_association = "enable"
+  default_route_table_propagation = "enable"
+  dns_support                     = "enable"
+  vpn_ecmp_support                = "enable"
 
   tags = merge(
     local.default_tags,
@@ -97,43 +101,62 @@ resource "aws_ec2_transit_gateway" "Mobilise_Academy_TGW" {
 # Transit Gateway Route Tables
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
-  transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
+  transit_gateway_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].id
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # The Local Transit Gateway VPC Attachment
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ec2_transit_gateway_vpc_attachment" "Public_to_VPC_B" {
+resource "aws_ec2_transit_gateway_vpc_attachment" "public_to_vpc_b" {
   count              = var.create_tgw_local_vpc_amt ? 1 : 0
   subnet_ids         = [for sn in var.tgw_local_vpc_att_sn_ids : aws_subnet.env_subnet[sn].id] 
-  transit_gateway_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].id
+  transit_gateway_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].id
   vpc_id             = aws_vpc.env_vpc[0].id
 
   transit_gateway_default_route_table_propagation = true
   transit_gateway_default_route_table_association = true
 }
+
+#  cross account transit gateway attachment
+resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
+  count              = var.create_tgw_atch ? 1 : 0
+  subnet_ids         = [for sn in var.tgw_atch_subnet_ids : aws_subnet.env_subnet[sn].id]
+  transit_gateway_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].id
+  vpc_id             = aws_vpc.env_vpc[0].id
+
+
+  transit_gateway_default_route_table_association = var.tgw_default_rtbl
+  transit_gateway_default_route_table_propagation = var.tgw_default_rtbl
+
+    depends_on = [aws_subnet.env_subnet]
+}
 resource "aws_ec2_transit_gateway_route" "tgw_local_vpc_route" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.Public_to_VPC_B[0].id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
   destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].association_default_route_table_id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
   destination_cidr_block         = "10.0.0.0/16"
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.Public_to_VPC_B[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].association_default_route_table_id
 }
 
 resource "aws_ec2_transit_gateway_route" "tgw_to_account_a" {
   destination_cidr_block         = "10.1.0.0/16"
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.x_act_tg_atmt[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.Mobilise_Academy_TGW[0].association_default_route_table_id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].association_default_route_table_id
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transit Gateway Route Table Associations & Propagations
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_ec2_transit_gateway_route_table_association" "tgw_vpn_rt_assoc" {
-  for_each                       = var.vpn_connections
-  transit_gateway_attachment_id  = data.aws_ec2_transit_gateway_vpn_attachment.env_tg_vpn_attmts[each.key].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.env_tgw_rtbl[lookup(each.value, "tgw_rt_tbl", "")].id
+resource "aws_ec2_transit_gateway_route_table_association" "tgw_local_vpc_rt_assoc" {
+  count                          = var.create_tgw_local_vpc_amt ? 1 : 0
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].association_default_route_table_id
+}
+resource "aws_ec2_transit_gateway_route_table_association" "tgw_foreign_vpc" {
+  count                          = var.create_tgw_local_vpc_amt ? 1 : 0
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway.mobilise_academy_tgw[0].association_default_route_table_id
 }

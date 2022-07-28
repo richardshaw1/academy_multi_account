@@ -1,5 +1,5 @@
 # ======================================================================================================================
-# SECURITY GROUPS AND RULES
+# SECURITY groupS AND RULES
 # ======================================================================================================================
 # ======================================================================================================================
 # VARIABLES
@@ -11,7 +11,7 @@ variable "sgs" {
 
 variable "ec2_sg_description" {
   description = "Description for the ec2 bw_bpc security group"
-  default     = "Security Group"
+  default     = "Security group"
 }
 
 variable "inbound_rules_tcp_sp_cidr" {
