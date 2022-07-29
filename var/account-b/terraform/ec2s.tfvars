@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # Variables for EC2 instances, EBS Volumes, elastic IPs if required and IAM Instance profiles
 # ----------------------------------------------------------------------------------------------------------------------
-ec2s = {  
+ec2s = {
   "wordpress_01" = {
     create_instance             = true
     sg_names                    = ["wordpress_ec2_sg"]
@@ -20,7 +20,7 @@ ec2s = {
     root_tag_name               = "ROOT"
     user_data                   = ("./templates/wordpress_bootstrap.sh")
   }
-    "wordpress_02" = {
+  "wordpress_02" = {
     create_instance             = true
     sg_names                    = ["wordpress_ec2_sg"]
     ami                         = "ami-034bbb7b632c2f16c"
