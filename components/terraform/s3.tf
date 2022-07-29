@@ -45,9 +45,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "assets_sse" {
 }
 
 resource "aws_s3_object" "object" {
-  bucket                 = "assets.rs.mobilise.academy"
-  key                    = "aws-certfied-cloud-practitioner"
-  source                 = "/Users/richardshaw/Downloads/aws-certified-cloud-practitioner.png"
+  bucket = "assets.rs.mobilise.academy"
+  key    = "aws-certfied-cloud-practitioner"
+  source = "/Users/richardshaw/Downloads/aws-certified-cloud-practitioner.png"
 
   depends_on = [
     aws_s3_bucket.assets

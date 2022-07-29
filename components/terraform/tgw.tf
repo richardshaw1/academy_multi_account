@@ -49,8 +49,6 @@ variable "tgw_route_tables" {
   default     = []
 }
 
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Create Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
@@ -83,7 +81,7 @@ resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway_vpc_attachment" "public_to_vpc_b" {
   count              = var.create_tgw_local_vpc_amt ? 1 : 0
-  subnet_ids         = [for sn in var.tgw_local_vpc_att_sn_ids : aws_subnet.env_subnet[sn].id] 
+  subnet_ids         = [for sn in var.tgw_local_vpc_att_sn_ids : aws_subnet.env_subnet[sn].id]
   transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
   vpc_id             = aws_vpc.env_vpc[0].id
 
@@ -102,7 +100,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
   transit_gateway_default_route_table_association = var.tgw_default_rtbl
   transit_gateway_default_route_table_propagation = var.tgw_default_rtbl
 
-    depends_on = [aws_subnet.env_subnet]
+  depends_on = [aws_subnet.env_subnet]
 }
 resource "aws_ec2_transit_gateway_route" "tgw_local_vpc_route" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id

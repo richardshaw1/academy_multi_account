@@ -33,13 +33,13 @@ resource "aws_instance" "instance_standard" {
   monitoring                  = lookup(each.value, "monitoring", null)
   user_data                   = lookup(each.value, "user_data", null) != null ? templatefile("${path.module}/${lookup(each.value, "user_data", "")}", {}) : null
 
-    tags = merge(
+  tags = merge(
     local.default_tags,
     {
-  
-      "Name"              = "${local.name_prefix}-${lookup(each.value, "tag_name", "")}"
-      "Owner"             = lookup(each.value, "tag_owner", "")
-      "Project"           = lookup(each.value, "tag_project", "")
+
+      "Name"    = "${local.name_prefix}-${lookup(each.value, "tag_name", "")}"
+      "Owner"   = lookup(each.value, "tag_owner", "")
+      "Project" = lookup(each.value, "tag_project", "")
     },
   )
 }

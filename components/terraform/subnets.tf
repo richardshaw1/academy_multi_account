@@ -1,6 +1,9 @@
 # ======================================================================================================================
 # SUBNETS
 # ======================================================================================================================
+# ======================================================================================================================
+# VARIABLES
+# ======================================================================================================================
 variable "create_subnets" {
   description = "Creates VPC Subnets"
   default     = false
@@ -36,20 +39,15 @@ resource "aws_subnet" "env_subnet" {
   vpc_id            = aws_vpc.env_vpc[0].id
   cidr_block        = var.subnet_cidrs[count.index]
   availability_zone = "${var.region_name}${var.environment_azs[count.index]}"
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Create private subnets
-# ----------------------------------------------------------------------------------------------------------------------
-/* resource "aws_subnet" "private_subnet" {
-  count             = var.create_subnets ? 1 : 0 * length(var.environment_azs)
-  vpc_id            = aws_vpc.env_vpc[0].id
-  cidr_block        = lookup(var.subnet_cidrs["private_subnet_cidrs"], count.index)
-  availability_zone = "${var.region_name}${var.environment_azs[count.index]}"
 
   tags = merge(
     local.default_tags,
     {
-      "Name" = "${local.name_prefix}-priv-subnet-${substr(var.environment_azs[count.index], -1, -1)}"
+      "CIDRRange" = var.subnet_cidrs[count.index]
+      "Name"      = "${local.name_prefix}-${var.subnet_names[count.index]}-${substr(var.environment_azs[count.index], -1, -1)}"
+      "Owner"     = "mobilise-academy"
+      "Project"   = "workshop"
+      "VPC"       = aws_vpc.env_vpc[0].id
     },
   )
-} */
+}

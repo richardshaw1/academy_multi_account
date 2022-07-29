@@ -33,7 +33,7 @@ resource "aws_eip" "env_ngw_eip" {
       "Name" = "${local.name_prefix}-ngw-eip-${substr(var.environment_azs[count.index], -1, -1)}"
     }
   )
-      depends_on = [aws_internet_gateway.env_igw]
+  depends_on = [aws_internet_gateway.env_igw]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -51,5 +51,5 @@ resource "aws_nat_gateway" "env_ngw" {
       "Name" = "${local.name_prefix}-ngw-${substr(var.environment_azs[count.index], -1, -1)}"
     }
   )
-    depends_on = [aws_internet_gateway.env_igw]
+  depends_on = [aws_internet_gateway.env_igw]
 }
