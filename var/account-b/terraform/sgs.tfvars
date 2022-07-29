@@ -86,13 +86,13 @@ inbound_rules_tcp_sp_cidr = {
     "port"        = 2049
     "description" = "NFS from Web APP 01"
     "my_sg"       = "efs_sg"
-    "cidr_blocks" = ["10.1.0.64/27"]
+    "cidr_blocks" = ["10.1.0.0/27"]
   }
   "efs_sg_2049_b" = {
     "port"        = 2049
     "description" = "NFS from Web APP 02"
     "my_sg"       = "efs_sg"
-    "cidr_blocks" = ["10.1.0.96/27"]
+    "cidr_blocks" = ["10.1.0.32/27"]
   }
   # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_sg - wordpress_ec2_sg
