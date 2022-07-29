@@ -55,6 +55,7 @@ variable "alb_listener_rules_fr" {
 # Application load balancer
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_lb" "env_alb" {
+  for_each           = var.albs
   name               = "${var.client_abbr}-${var.environment}-alb"
   internal           = false
   load_balancer_type = "application"
@@ -74,14 +75,15 @@ resource "aws_lb" "env_alb" {
 # ----------------------------------------------------------------------------------------------------------------------
 # Listeners
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_lb_listener" "alb_listener_r" {
-  load_balancer_arn = aws_lb.env_alb.arn
+resource "aws_lb_listener" "alb_listener_f" {
+  for_each          = var.alb_listeners_f
+  load_balancer_arn = aws_lb.env_alb[lookup(each.value, "alb", "")].arn
   port              = lookup(each.value, "port", 0)
   protocol          = lookup(each.value, "protocol", "")
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.env_alb_tg.arn
+    target_group_arn = aws_lb_target_group.env_alb_tg[lookup(each.value, "target_group", 0)].arn
   }
 }
 
