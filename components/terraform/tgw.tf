@@ -31,7 +31,7 @@ variable "ram_principals" {
 
 variable "transit_gateway_asn" {
   description = "The asn of the transit gateway. Default is 64512."
-  default     = "64514"
+  default     = ""
 }
 
 variable "tgw_routes" {
@@ -90,7 +90,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "public_to_vpc_b" {
   transit_gateway_default_route_table_association = true
 }
 
-#  cross account transit gateway attachment
+/* #  cross account transit gateway attachment
 resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
   count              = var.create_tgw_atch ? 1 : 0
   subnet_ids         = [for sn in var.tgw_atch_subnet_ids : aws_subnet.env_subnet[sn].id]
@@ -141,4 +141,25 @@ resource "aws_ec2_transit_gateway_route_table_association" "tgw_foreign_vpc" {
   count                          = var.create_tgw_local_vpc_amt ? 1 : 0
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.env_tgw[0].association_default_route_table_id
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Resource Access Management (RAM) resources
+# ----------------------------------------------------------------------------------------------------------------------
+resource "aws_ram_resource_share" "env_ram_share" {
+  count                     = var.create_tgw ? 1 : 0
+  name                      = "env_ram_share"
+  allow_external_principals = true
+}
+
+resource "aws_ram_resource_association" "env_ram_res_asoct" {
+  count              = var.create_tgw ? 1 : 0
+  resource_arn       = aws_ec2_transit_gateway.env_tgw[0].arn
+  resource_share_arn = aws_ram_resource_share.env_ram_share[0].arn
+}
+
+resource "aws_ram_principal_association" "ram_principal" {
+  count              = length(var.ram_principals) < 0 ? 0 : length(var.ram_principals) * (var.create_tgw ? 1 : 0)
+  principal          = var.ram_principals[count.index]
+  resource_share_arn = aws_ram_resource_share.env_ram_share[0].arn
 }

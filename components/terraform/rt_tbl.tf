@@ -48,7 +48,7 @@ variable "tgw_account_a_subnets" {
 # Route Table
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route_table" "env_rt_tbl" {
-  count  = length(var.subnet_names)
+  count  = (var.create_rtbl ? 1 : 0) * length(var.subnet_names)
   vpc_id = aws_vpc.env_vpc[0].id
 
   tags = merge(
@@ -63,43 +63,23 @@ resource "aws_route_table" "env_rt_tbl" {
 # ROUTES - Account A
 # ======================================================================================================================
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: Public Subnet 01 to Internet Gateway
+# Route: Public Subnets to Internet Gateway
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "pub_sub_01_to_internet" {
+resource "aws_route" "pub_sub_to_internet" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.env_igw[0].id
+  gateway_id    = aws_internet_gateway.env_igw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: Public Subnet 01 to Account-B via Transit Gateway
+# Route: Public Subnets to Account-B via Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "pub_sub_01_to_vpc_b" {
+resource "aws_route" "pub_sub_to_vpc_b" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = local.vpc_b_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Public Subnet 02 to Internet Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "pub_sub_02_to_internet" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.env_igw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Public Subnet 02 to Account-B via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "pub_sub_02_to_vpc_b" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = local.vpc_b_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
+  transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
 # ----------------------------------------------------------------------------------------------------------------------
@@ -109,139 +89,51 @@ resource "aws_route" "ngw_sub_01_to_internet" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.env_igw[0].id
+  gateway_id     = aws_internet_gateway.env_igw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
+
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: NAT Gateway Subnet 01 to Account-B via Transit Gateway
+# Route: Transit Gateway Subnets to Internet Gateway
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "ngw_sub_01_to_vpc_b" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = local.vpc_b_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Transit Gateway Subnet 01 to Internet Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "tgw_sub_01_to_internet" {
+resource "aws_route" "tgw_sub_to_internet" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.env_igw[0].id
+  transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: Transit Gateway Subnet 01 to Account-B via Transit Gateway
+# Route: Transit Gateway to Account-B via Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route" "tgw_sub_01_to_vpc_b" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = local.vpc_b_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
+  transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Transit Gateway Subnet 02 to Internet Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "tgw_sub_02_to_internet" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.env_igw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Transit Gateway Subnet 02 to Account-B via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "tgw_sub_02_to_vpc_b" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = local.vpc_b_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
+
 # ======================================================================================================================
 # ROUTES - Account B
 # ======================================================================================================================
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (APP) 01 to Internet via Transit Gateway
+# Route: Private Subnets (APP & DATA) to Internet via Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_app_01_to_internet" {
+resource "aws_route" "priv_sub_app_to_internet" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
+  transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (APP) 01 to Account-A via Transit Gateway
+# Route: Private Subnet (APP & DATA) 01 to Account-A via Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route" "priv_sub_app_01_to_vpc_a" {
   count                  = var.create_rt ? 1 : 0
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = local.vpc_a_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (APP) 02 to Internet via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_app_02_to_internet" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (APP) 02 to Account-A via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_app_02_to_vpc_a" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = local.vpc_a_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (DATA)) 01 to Internet via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_data_01_to_internet" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (DATA) 01 to Account-A via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_data_01_to_vpc_a" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = local.vpc_a_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (DATA) 02 to Internet via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_data_02_to_internet" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
-  depends_on             = [aws_route_table.env_rt_tbl]
-}
-# ----------------------------------------------------------------------------------------------------------------------
-# Route: Private Subnet (DATA) 02 to Account-A via Transit Gateway
-# ----------------------------------------------------------------------------------------------------------------------
-resource "aws_route" "priv_sub_data_02_to_vpc_a" {
-  count                  = var.create_rt ? 1 : 0
-  route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-  destination_cidr_block = local.vpc_a_cidr
-  gateway_id             = aws_ec2_transit_gateway.env_tgw[0].id
+  transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
   depends_on             = [aws_route_table.env_rt_tbl]
 }
