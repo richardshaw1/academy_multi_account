@@ -14,7 +14,7 @@ sgs = {
   }
   "aurora_sg" = {
     "ec2_sg_name_suffix" = "aurora-sg"
-    "ec2_sg_description" = "Security group for the Agresso nonprod web application load balancer 01"
+    "ec2_sg_description" = "Security group for the Aurora DB RDS cluster"
   }
   # -----------------------------------------------------------------------------------------------------------------
 }

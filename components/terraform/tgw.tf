@@ -73,6 +73,7 @@ resource "aws_ec2_transit_gateway" "env_tgw" {
 # Transit Gateway Route Tables
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
+  for_each           = toset(var.tgw_route_tables)
   transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
 }
 
@@ -102,22 +103,31 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
 
   depends_on = [aws_subnet.env_subnet]
 }
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Transit Gateway Route Tables Routes
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway_route" "tgw_local_vpc_route" {
+  for_each = { for key, value in var.tgw_routes :
+    key => value
+  if lookup(value, "vpc_attachment", "") == "local" }
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
   destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.env_tgw[0].association_default_route_table_id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[lookup(each.value, "tgw_route_table", "")].id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
+  for_each = { for key, value in var.tgw_routes :
+    key => value
+  if lookup(value, "vpc_attachment", "") != "local" && lookup(value, "vpc_attachment", "") != "" }
   destination_cidr_block         = "10.0.0.0/16"
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.env_tgw[0].association_default_route_table_id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[lookup(each.value, "tgw_route_table", "")].id
 }
 
-resource "aws_ec2_transit_gateway_route" "tgw_to_account_a" {
+/* resource "aws_ec2_transit_gateway_route" "tgw_to_account_a" {
   destination_cidr_block         = "10.1.0.0/16"
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.x_act_tg_atmt[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.env_tgw[0].association_default_route_table_id
-}
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[lookup(each.value, "tgw_route_table", "")].id
+} */
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transit Gateway Route Table Associations & Propagations

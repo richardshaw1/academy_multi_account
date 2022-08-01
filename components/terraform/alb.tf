@@ -28,26 +28,6 @@ variable "alb_listener_rules_f" {
   default     = {}
 }
 
-variable "alb_listeners_r" {
-  description = "A map of all listeners that have a default action of redirect"
-  default     = {}
-}
-
-variable "alb_listener_rules_r" {
-  description = "A map of all listener rules that have a default action of redirect"
-  default     = {}
-}
-
-variable "alb_listeners_fr" {
-  description = "A map of all listeners that have default action of fixed-response"
-  default     = {}
-}
-
-variable "alb_listener_rules_fr" {
-  description = "A map of all listener rules that have default action of fixed-response"
-  default     = {}
-}
-
 # ======================================================================================================================
 # RESOURCES
 # ======================================================================================================================
@@ -86,6 +66,22 @@ resource "aws_lb_listener" "alb_listener_f" {
     target_group_arn = aws_lb_target_group.env_alb_tg[lookup(each.value, "target_group", 0)].arn
   }
 }
+  resource "aws_lb_listener_rule" "alb_listener_rule_f" {
+  for_each     = var.alb_listener_rules_f
+  listener_arn = aws_lb_listener.alb_listener_f[lookup(each.value, "listener", 0)].arn
+  priority     = lookup(each.value, "priority", 0)
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.env_alb_tg[lookup(each.value, "target_group", 0)].arn
+  }
+
+  condition {
+    host_header {
+      values = lookup(each.value, "host_header_values", ["*"])
+    }
+  }
+  }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Target Groups
