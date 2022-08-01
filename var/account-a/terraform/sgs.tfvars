@@ -32,9 +32,8 @@ sgs = {
     "port"        = 22
     "description" = "SSH from Internet from my IP"
     "my_sg"       = "ssh_from_internet"
-    "cidr_blocks" = [" 86.142.13.136/32"]
+    "cidr_blocks" = ["86.142.13.136/32"]
   }
-
   "ssh_from_internet_my_ip" = {
     "port"        = 22
     "description" = "SSH from Internet from my IP"

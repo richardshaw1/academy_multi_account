@@ -16,6 +16,14 @@ sgs = {
     "ec2_sg_name_suffix" = "aurora-sg"
     "ec2_sg_description" = "Security group for the Aurora DB RDS cluster"
   }
+  "memcached_sg" = {
+    "ec2_sg_name_suffix" = "memcached-sg"
+    "ec2_sg_description" = "Allows in-memory data store between Web application and Memcached cluster"
+  }
+    "efs_sg" = {
+    "ec2_sg_name_suffix" = "efs-sg"
+    "ec2_sg_description" = "Allows NFS access between Web App and EFS"
+  }
   # -----------------------------------------------------------------------------------------------------------------
 }
 # ===================================================================================================================
@@ -47,7 +55,7 @@ inbound_rules_tcp_sp_cidr = {
     "port"        = 22
     "description" = "SSH Ingress from Bastion Host"
     "my_sg"       = "wordpress_ec2_sg"
-    "cidr_blocks" = ["10.0.0.20/32"]
+    "cidr_blocks" = ["10.0.0.8/32"]
   }
   # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_cidr - aurora_sg
@@ -73,7 +81,7 @@ inbound_rules_tcp_sp_cidr = {
     "my_sg"       = "memcached_sg"
     "cidr_blocks" = ["10.1.0.0/27"]
   }
-  "aurora_sg_3306_b" = {
+  "memcached_sg_11211_b" = {
     "port"        = 11211
     "description" = "Memcached from Web APP 02"
     "my_sg"       = "memcached_sg"
