@@ -37,7 +37,3 @@ variable "tgw_default_rtbl" {
 
   depends_on = [aws_subnet.env_subnet]
 } */
-
-data "aws_ec2_transit_gateway" "env_tgw" {
-  count = var.create_tgw_atch ? 1 : 0
-}

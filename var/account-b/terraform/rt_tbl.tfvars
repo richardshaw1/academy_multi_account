@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 create_rtbl         = true
 create_rt           = true
-get_tgw_id          = true
+get_tgw_id          = false
 transit_gateway_asn = "64514"
 
 tgw_subnets           = ["0", "1", "2", "3"]

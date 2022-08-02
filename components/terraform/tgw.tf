@@ -49,11 +49,18 @@ variable "tgw_route_tables" {
   default     = []
 }
 
+variable "create_tgw_route_table" {
+  type        = bool
+  description = "creates tgw route table"
+  default     = false
+
+}
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Create Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway" "env_tgw" {
-  count                           = (var.create_tgw ? 1 : 0)
+  count                           = var.create_tgw ? 1 : 0
   description                     = "mobilise-academy-tgw"
   amazon_side_asn                 = var.transit_gateway_asn
   auto_accept_shared_attachments  = "enable"
@@ -73,7 +80,7 @@ resource "aws_ec2_transit_gateway" "env_tgw" {
 # Transit Gateway Route Tables
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
-  for_each           = toset(var.tgw_route_tables)
+  count              = var.create_tgw_route_table ? 1 : 0
   transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
 }
 
@@ -83,8 +90,9 @@ resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
 resource "aws_ec2_transit_gateway_vpc_attachment" "public_to_vpc_b" {
   count              = var.create_tgw_local_vpc_amt ? 1 : 0
   subnet_ids         = [for sn in var.tgw_local_vpc_att_sn_ids : aws_subnet.env_subnet[sn].id]
-  transit_gateway_id = aws_ec2_transit_gateway.env_tgw[count.index].id
+  transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
   vpc_id             = aws_vpc.env_vpc[0].id
+  depends_on         = [aws_subnet.env_subnet]
 
   transit_gateway_default_route_table_propagation = true
   transit_gateway_default_route_table_association = true
@@ -99,14 +107,14 @@ resource "aws_ec2_transit_gateway_route" "tgw_local_vpc_route" {
   if lookup(value, "vpc_attachment", "") == "local" }
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
   destination_cidr_block         = "0.0.0.0/0"
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[lookup(each.value, "tgw_route_table", "")].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[0].id
 }
 resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
   for_each = { for key, value in var.tgw_routes :
     key => value
   if lookup(value, "vpc_attachment", "") != "local" && lookup(value, "vpc_attachment", "") != "" }
   destination_cidr_block         = "10.0.0.0/16"
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[lookup(each.value, "tgw_route_table", "")].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[0].id
 }
 
 /* resource "aws_ec2_transit_gateway_route" "tgw_to_account_a" {
@@ -121,8 +129,15 @@ resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
 resource "aws_ec2_transit_gateway_route_table_association" "tgw_local_vpc_rt_assoc" {
   count                          = var.create_tgw_local_vpc_amt ? 1 : 0
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[var.environment].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[0].id
 }
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "env_tgw_rp" {
+  count                          = var.create_tgw_local_vpc_amt ? 1 : 0
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[0].id
+}
+
 /* resource "aws_ec2_transit_gateway_route_table_association" "tgw_foreign_vpc" {
   count                          = var.create_tgw_local_vpc_amt ? 1 : 0
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id

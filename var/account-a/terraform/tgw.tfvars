@@ -3,6 +3,7 @@
 # -------------------------------------------------------------------------------------------------------------------
 create_tgw               = true
 create_tgw_local_vpc_amt = true
+create_tgw_route_table   = true
 tgw_local_vpc_att_sn_ids = ["3", "4"]
 tgw_name_suffix          = "transit-tgw"
 transit_gateway_asn      = "64514"
