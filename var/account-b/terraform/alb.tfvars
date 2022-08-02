@@ -22,7 +22,7 @@ alb_listeners_f = {
     "alb"          = "wordpress_alb"
     "port"         = 80
     "protocol"     = "HTTP"
-    "target_group" = "wordpress_target_group"
+    "target_group" = "wordpress_alb_tg"
     "acm_cert"     = ""
     "ssl_policy"   = ""
   }

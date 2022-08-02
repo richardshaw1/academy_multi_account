@@ -63,7 +63,7 @@ resource "aws_lb_listener" "alb_listener_f" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.env_alb_tg[lookup(each.value, "target_group", 0)].arn
+    target_group_arn = aws_lb_target_group.env_alb_tg[lookup(each.value, "target_group", "")].arn
   }
 }
   resource "aws_lb_listener_rule" "alb_listener_rule_f" {

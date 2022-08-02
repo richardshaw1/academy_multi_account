@@ -25,7 +25,7 @@ variable "tgw_default_rtbl" {
 }
 
 # cross account transit gateway attachment
-resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
+/* resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
   count              = var.create_tgw_atch ? 1 : 0
   subnet_ids         = [for sn in var.tgw_atch_subnet_ids : aws_subnet.env_subnet[sn].id]
   transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
@@ -36,8 +36,8 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
   transit_gateway_default_route_table_propagation = var.tgw_default_rtbl
 
   depends_on = [aws_subnet.env_subnet]
-}
+} */
 
-data "aws_ec2_transit_gateway" "env_mgmt_account_tgw" {
+data "aws_ec2_transit_gateway" "env_tgw" {
   count = var.create_tgw_atch ? 1 : 0
 }

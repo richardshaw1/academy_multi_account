@@ -53,7 +53,7 @@ variable "tgw_route_tables" {
 # Create Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_ec2_transit_gateway" "env_tgw" {
-  count                           = var.create_tgw ? 1 : 0
+  count                           = (var.create_tgw ? 1 : 0)
   description                     = "mobilise-academy-tgw"
   amazon_side_asn                 = var.transit_gateway_asn
   auto_accept_shared_attachments  = "enable"
@@ -83,25 +83,11 @@ resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
 resource "aws_ec2_transit_gateway_vpc_attachment" "public_to_vpc_b" {
   count              = var.create_tgw_local_vpc_amt ? 1 : 0
   subnet_ids         = [for sn in var.tgw_local_vpc_att_sn_ids : aws_subnet.env_subnet[sn].id]
-  transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
+  transit_gateway_id = aws_ec2_transit_gateway.env_tgw[count.index].id
   vpc_id             = aws_vpc.env_vpc[0].id
 
   transit_gateway_default_route_table_propagation = true
   transit_gateway_default_route_table_association = true
-}
-
-/* #  cross account transit gateway attachment
-resource "aws_ec2_transit_gateway_vpc_attachment" "x_act_tg_atmt" {
-  count              = var.create_tgw_atch ? 1 : 0
-  subnet_ids         = [for sn in var.tgw_atch_subnet_ids : aws_subnet.env_subnet[sn].id]
-  transit_gateway_id = aws_ec2_transit_gateway.env_tgw[0].id
-  vpc_id             = aws_vpc.env_vpc[0].id
-
-
-  transit_gateway_default_route_table_association = var.tgw_default_rtbl
-  transit_gateway_default_route_table_propagation = var.tgw_default_rtbl
-
-  depends_on = [aws_subnet.env_subnet]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -135,13 +121,13 @@ resource "aws_ec2_transit_gateway_route" "tgw_vpc_route" {
 resource "aws_ec2_transit_gateway_route_table_association" "tgw_local_vpc_rt_assoc" {
   count                          = var.create_tgw_local_vpc_amt ? 1 : 0
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway.env_tgw[0].association_default_route_table_id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table[var.environment].id
 }
-resource "aws_ec2_transit_gateway_route_table_association" "tgw_foreign_vpc" {
+/* resource "aws_ec2_transit_gateway_route_table_association" "tgw_foreign_vpc" {
   count                          = var.create_tgw_local_vpc_amt ? 1 : 0
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.public_to_vpc_b[0].id
   transit_gateway_route_table_id = aws_ec2_transit_gateway.env_tgw[0].association_default_route_table_id
-}
+} */
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Resource Access Management (RAM) resources
