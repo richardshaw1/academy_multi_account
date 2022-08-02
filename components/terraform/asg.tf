@@ -4,7 +4,7 @@
 # ======================================================================================================================
 # VARIABLES
 # ======================================================================================================================
-/* variable "asgs" {
+variable "asgs" {
   description = "A map of all autoscaling groups to create"
   default     = {}
 }
@@ -14,18 +14,18 @@ variable "lts" {
   default     = {}
 }
 
-variable "logstash_cw_alarms" {
-  description = "A map of the required CloudWatch alarms for the logstash instances"
+variable "cw_alarms" {
+  description = "A map of the required CloudWatch alarms for instances"
   default     = {}
 }
 
-variable "logstash_instances" {
-  description = "The number of logstash instances. Used to assign tags to the asg"
+variable "instances" {
+  description = "The number of instances. Used to assign tags to the asg"
   default     = 0
 }
 
 variable "account_hostname_prefix" {
-  description = "The digit, x, that acts as a prefix to all instances in the account. AWSARVLx"
+  description = "The digit, x, that acts as a prefix to all instances in the account."
   default     = "X"
 }
 
@@ -60,4 +60,4 @@ resource "aws_launch_template" "env_lt" {
       volume_type = lookup(each.value, "volume_type", "")
     }
   }
-} */
+}
