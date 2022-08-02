@@ -14,7 +14,7 @@ sgs = {
   }
   "aurora_sg" = {
     "ec2_sg_name_suffix" = "aurora-sg"
-    "ec2_sg_description" = "Security group for the Aurora DB RDS cluster"
+    "ec2_sg_description" = "Security group for the Aurora DB RDS cluster. Allows data transfer between Web application and RDS instance"
   }
   "memcached_sg" = {
     "ec2_sg_name_suffix" = "memcached-sg"
