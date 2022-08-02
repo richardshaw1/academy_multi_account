@@ -90,10 +90,10 @@ resource "aws_route" "pub_sub_to_vpc_b" {
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Route: Transit Gateway Subnets to Internet Gateway
+# Route: Direct Traffic via Transit Gateway
 # ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route" "tgw_sub_to_internet" {
-  count                  = length(var.tgw_igw_subnets) * (var.get_tgw_id ? 1 : 0)
+  count                  = length(var.tgw_igw_subnets)
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
