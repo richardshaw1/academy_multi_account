@@ -35,6 +35,16 @@ resource "aws_elasticache_cluster" "elasticache_cluster" {
   num_cache_nodes      = lookup(each.value, "num_cache_nodes", "")
   parameter_group_name = lookup(each.value, "parameter_group_name", "")
   port                 = lookup(each.value, "port", "")
+
+    tags = merge(
+    local.default_tags,
+    {
+
+      "Name"    = "${local.name_prefix}-${lookup(each.value, "tag_name", "")}"
+      "Owner"   = lookup(each.value, "tag_owner", "")
+      "Project" = lookup(each.value, "tag_project", "")
+    },
+    )
 }
 
 resource "aws_elasticache_subnet_group" "elasticache_subnet_group" {
@@ -42,4 +52,14 @@ resource "aws_elasticache_subnet_group" "elasticache_subnet_group" {
   key => value }
   name       = lookup(each.value, "name", "")
   subnet_ids = lookup(each.value, "subnet_ids", "")
+
+      tags = merge(
+    local.default_tags,
+    {
+
+      "Name"    = "${local.name_prefix}-${lookup(each.value, "tag_name", "")}"
+      "Owner"   = lookup(each.value, "tag_owner", "")
+      "Project" = lookup(each.value, "tag_project", "")
+    },
+      )
 }

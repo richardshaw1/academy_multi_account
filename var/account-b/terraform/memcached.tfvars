@@ -12,12 +12,18 @@ elasticache_clusters  = {
   num_cache_nodes      = 1
   parameter_group_name = "default.memcached1.6"
   port                 = 11211
+  tag_name             = "memcached-cluster"
+  tag_owner            = "mobilise-academy"
+  tag_project          = "mobilise-academy-workshop"
 }
 }
 
 elasticache_subnet_groups = {
     "memcached_subnet_group" = {
   name       = "memcached-subnet-group"
-  subnet_ids = ["2", "3"]
+  subnet_ids = ["2", /*"3"*/]
+  tag_name             = "memcached-cluster"
+  tag_owner            = "mobilise-academy"
+  tag_project          = "mobilise-academy-workshop"
 }
 }
