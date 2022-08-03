@@ -3,13 +3,13 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 subnet_names = {
-    # Private APP Subnets for Wordpress EC2
-    "0" = "private-subnet-(APP)-01"
-    "1" = "private-subnet-(APP)-02"
-    # Private DATA Subnets for Databases
-    "2" = "private-subnet-(DATA)-01"
-    "3" = "private-subnet-(DATA)-02"
-  }
+  # Private APP Subnets for Wordpress EC2
+  "0" = "private-subnet-(APP)-01"
+  "1" = "private-subnet-(APP)-02"
+  # Private DATA Subnets for Databases
+  "2" = "private-subnet-(DATA)-01"
+  "3" = "private-subnet-(DATA)-02"
+}
 
 subnet_cidrs = {
   # Private APP Subnets for Wordpress EC2

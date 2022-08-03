@@ -20,7 +20,7 @@ sgs = {
     "ec2_sg_name_suffix" = "memcached-sg"
     "ec2_sg_description" = "Allows in-memory data store between Web application and Memcached cluster"
   }
-    "efs_sg" = {
+  "efs_sg" = {
     "ec2_sg_name_suffix" = "efs-sg"
     "ec2_sg_description" = "Allows NFS access between Web App and EFS"
   }

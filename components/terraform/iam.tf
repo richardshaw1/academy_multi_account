@@ -96,7 +96,7 @@ resource "aws_iam_user_policy" "s3_full_access" {
   count = var.create_iam_user ? 1 : 0
   name     = var.iam_user_policy_name
   user     = var.iam_users
-  policy   = file("./templates/s3_full_access.json")
+  policy   = data.template_file.s3_full_access_policy_template
 }
 resource "aws_iam_user_group_membership" "mobiliseacademygroup_membership" {
   count  = var.create_iam_user ? 1 : 0

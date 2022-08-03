@@ -50,7 +50,7 @@ alb_targets = {
     "target_port"       = 80
     "availability_zone" = "eu-west-2a"
   }
-    "wordpress_tg_10.1.0.43_80" = {
+  "wordpress_tg_10.1.0.43_80" = {
     "target_ip"         = "10.1.0.43"
     "target_group"      = "wordpress_alb_tg"
     "target_port"       = 80
