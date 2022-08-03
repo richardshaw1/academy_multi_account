@@ -52,10 +52,10 @@ resource "aws_lb" "env_lb_nlb" {
   tags = merge(
     local.default_tags,
     {
-      "Name"           = "${local.name_prefix}-${lookup(each.value, "nlb_name")}"
-      "Owner"          = "Mobilise-Academy"
-      "Project"        = "Workshop"
-      "VPC"            = aws_vpc.env_vpc[0].id
+      "Name"    = "${local.name_prefix}-${lookup(each.value, "nlb_name")}"
+      "Owner"   = "Mobilise-Academy"
+      "Project" = "Workshop"
+      "VPC"     = aws_vpc.env_vpc[0].id
     },
   )
 }

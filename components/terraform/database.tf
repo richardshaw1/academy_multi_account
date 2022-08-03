@@ -6,7 +6,7 @@
 # ===================================================================================================================
 variable "create_db" {
   description = "true or false whether a database should be created"
-  default = false
+  default     = false
 }
 
 variable "db_subnet_ids" {
@@ -15,13 +15,13 @@ variable "db_subnet_ids" {
 }
 
 variable "db_cluster" {
- description = "map of all db clusters"
- default = []
+  description = "map of all db clusters"
+  default     = []
 }
 
 variable "db_cluster_instance" {
   description = "map of db cluster instances"
-  default = []
+  default     = []
 }
 
 # ======================================================================================================================
@@ -51,8 +51,8 @@ resource "aws_rds_cluster" "rds_cluster" {
 }
 
 resource "aws_rds_cluster_instance" "db_cluster_instance" {
-    for_each = { for key, value in var.db_cluster_instance :
-    key => value }
+  for_each = { for key, value in var.db_cluster_instance :
+  key => value }
   cluster_identifier = lookup(each.value, "cluster_identifier", "")
   instance_class     = lookup(each.value, "instance_class", "")
   engine             = lookup(each.value, "engine", "")

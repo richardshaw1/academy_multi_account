@@ -41,13 +41,13 @@ resource "aws_lb" "env_alb" {
   load_balancer_type = "application"
   subnets            = [for sn in lookup(each.value, "alb_subnets", []) : aws_subnet.env_subnet[sn].id]
   security_groups    = [aws_security_group.ec2_sg[element(lookup(each.value, "alb_sgs", ""), 0)].id]
-  
+
   tags = merge(
     local.default_tags,
     {
-      "Name"           = "${local.name_prefix}-${lookup(each.value, "alb_name", "")}"
-      "Owner"          = "Mobilise-Academy"
-      "Project"        = "Workshop"
+      "Name"    = "${local.name_prefix}-${lookup(each.value, "alb_name", "")}"
+      "Owner"   = "Mobilise-Academy"
+      "Project" = "Workshop"
     }
   )
 }
@@ -66,7 +66,7 @@ resource "aws_lb_listener" "alb_listener_f" {
     target_group_arn = aws_lb_target_group.env_alb_tg[lookup(each.value, "target_group", "")].arn
   }
 }
-  resource "aws_lb_listener_rule" "alb_listener_rule_f" {
+resource "aws_lb_listener_rule" "alb_listener_rule_f" {
   for_each     = var.alb_listener_rules_f
   listener_arn = aws_lb_listener.alb_listener_f[lookup(each.value, "listener", 0)].arn
   priority     = lookup(each.value, "priority", 0)
@@ -81,7 +81,7 @@ resource "aws_lb_listener" "alb_listener_f" {
       values = lookup(each.value, "host_header_values", ["*"])
     }
   }
-  }
+}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Target Groups

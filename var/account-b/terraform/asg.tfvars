@@ -12,6 +12,7 @@ asgs = {
     asg_desired_capacity = "2"
     tag_project          = ""
     load_balancer        = "wordpress_alb"
+    lt_resource_name     = "wordpress_lt"
   }
 }
 
