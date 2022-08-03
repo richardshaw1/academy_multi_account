@@ -88,7 +88,7 @@ resource "aws_autoscaling_group" "env_asg" {
   load_balancers            = [aws_lb.env_alb[lookup(each.value, "load_balancer", "")].name]
 
   launch_template {
-  id      = aws_launch_template.env_lt[lookup(each.value, "lt_resource_name", "")].id   
-  version = "$Latest"
+    id      = aws_launch_template.env_lt[lookup(each.value, "lt_resource_name", "")].id
+    version = "$Latest"
   }
 }

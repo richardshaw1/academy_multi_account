@@ -9,7 +9,7 @@ variable "create_db" {
   default     = false
 }
 
-variable "db_subnet_ids" {
+variable "subnet_ids" {
   description = "A list of subnet ids as defined in subnet.tfvars to attach to databases"
   default     = []
 }
@@ -25,8 +25,8 @@ variable "db_cluster_instance" {
 }
 
 variable "db_subnet_group" {
-    description = "map of db subnet groups"
-    default = []
+  description = "map of db subnet groups"
+  default     = []
 }
 
 
@@ -69,9 +69,9 @@ resource "aws_rds_cluster_instance" "db_cluster_instance" {
 # -------------------------------------------------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "db_subnet_group" {
-    for_each = { for key, value in var.db_subnet_group :
+  for_each = { for key, value in var.db_subnet_group :
   key => value }
-name        = lookup(each.value, "name", "")
-subnet_ids  = lookup(each.value, "subnet_ids")
-  tags = {}
+  name       = lookup(each.value, "name", "")
+  subnet_ids = lookup(each.value, "subnet_ids")
+  tags       = {}
 }
