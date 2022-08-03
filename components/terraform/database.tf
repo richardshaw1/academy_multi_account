@@ -24,6 +24,12 @@ variable "db_cluster_instance" {
   default     = []
 }
 
+variable "db_subnet_group" {
+    description = "map of db subnet groups"
+    default = []
+}
+
+
 # ======================================================================================================================
 # RESOURCE CREATION
 # ======================================================================================================================
@@ -47,7 +53,6 @@ resource "aws_rds_cluster" "rds_cluster" {
   db_cluster_instance_class = lookup(each.value, "db_cluster_instance_class", "")
   kms_key_id                = lookup(each.value, "kms_key_id", "")
   storage_encrypted         = lookup(each.value, "storage_encrypted", "")
-
 }
 
 resource "aws_rds_cluster_instance" "db_cluster_instance" {
@@ -64,11 +69,9 @@ resource "aws_rds_cluster_instance" "db_cluster_instance" {
 # -------------------------------------------------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name        = "aurora_subnet_group"
-  description = "Subnet group for the aurora DB cluster"
-  subnet_ids  = [for sn in var.db_subnet_ids : aws_subnet.env_subnet[sn].id]
-
-  tags = {
-    Name = "aurora-db-subnet-group"
-  }
+    for_each = { for key, value in var.db_subnet_group :
+  key => value }
+name        = lookup(each.value, "name", "")
+subnet_ids  = lookup(each.value, "subnet_ids")
+  tags = {}
 }
