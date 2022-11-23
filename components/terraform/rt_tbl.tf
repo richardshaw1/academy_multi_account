@@ -36,8 +36,6 @@ variable "private_subnets" {
   description = "List of subnets that want to pass all traffic (0.0.0.0/0) through the transit gateway"
   default     = []
 }
-<<<<<<< HEAD
-
 variable "tgw_vpc_a_subnets" {
   description = "List of subnets to route to the internet via the transit gateway"
   default     = []
@@ -47,8 +45,7 @@ variable "tgw_vpc_b_subnets" {
   description = "List of subnets to route to the internet via the transit gateway"
   default     = []
 }
-=======
->>>>>>> origin/main
+
 # ======================================================================================================================
 # RESOURCE CREATION
 # ======================================================================================================================
@@ -117,7 +114,6 @@ resource "aws_route" "igw_route" {
 # ----------------------------------------------------------------------------------------------------------------------
 # Route: Public Route to VPC-B
 # ----------------------------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
 resource "aws_route" "tgw_route" {
   count                  = length(var.tgw_subnets) * (var.get_tgw_id ? 1 : 0)
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
@@ -164,11 +160,10 @@ resource "aws_route" "env_route_to_vpc_a" {
 resource "aws_route" "tgw_sub_01_to_vpc_b" {
   count                  = length(var.tgw_account_b_subnets) * (var.get_tgw_id ? 1 : 0)
   route_table_id         = aws_route_table.env_rt_tbl[count.index].id
-=======
+  }
 resource "aws_route" "pub_to_vpc_b" {
   count                  = (var.create_route ? 1 : 0) * length(var.igw_subnets)
   route_table_id         = element(aws_route_table.env_rt_tbl.*.id, element(var.igw_subnets, count.index))
->>>>>>> origin/main
   destination_cidr_block = local.vpc_b_cidr
   transit_gateway_id     = aws_ec2_transit_gateway.env_tgw[0].id
   depends_on             = [aws_ec2_transit_gateway.env_tgw]
@@ -212,4 +207,4 @@ resource "aws_route" "priv_sub_to_vpc_b" {
   destination_cidr_block = local.vpc_a_cidr
   transit_gateway_id     = data.aws_ec2_transit_gateway.env_transit_gateway[0].id
   depends_on             = [aws_ec2_transit_gateway.env_tgw]
-}
+} */
