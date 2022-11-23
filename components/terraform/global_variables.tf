@@ -18,7 +18,12 @@ variable "project" {
 variable "client_abbr" {
   type        = string
   description = "Abbreviated name of the client e.g mobilise = 'mob'"
-  default     = "mobilise-academy"
+  default     = "mob"
+}
+
+variable "environment" {
+  description = "Name of the environment the resource is deployed to, e.g. Dev, Test, Int, etc."
+  default     = ""
 }
 
 variable "region_name" {
@@ -27,20 +32,20 @@ variable "region_name" {
   default     = "eu-west-2"
 }
 
-variable "environment" {
-  description = "Name of the environment the resource is deployed to, e.g. Dev, Test, Int, etc."
-  default     = ""
-}
-
 variable "environment_azs" {
   type        = map(string)
   description = "Map list of the number of Availability Zones to use and which character to use for the suffix e.g eu-west-2c"
   default = {
     "0" = "a"
     "1" = "b"
-    "2" = "c"
   }
 }
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+}
+
 
 # -------------------------------------------------------------------------------------------------------------------
 # Locally defined variables

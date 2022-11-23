@@ -6,11 +6,24 @@
 # ===================================================================================================================
 
 variable "create_iam_user" {
-  default = false
+  type        = bool
+  description = "creates iam user"
+  default     = false
 }
 variable "iam_groups" {
   description = "list of iam group names"
-  default     = []
+  default     = ""
+}
+
+variable "iam_role_01_name" {
+  description = "name of iam role"
+  type        = string
+  default     = ""
+}
+
+variable "iam_group_policy" {
+  type    = string
+  default = ""
 }
 
 variable "iam_group_policies" {
@@ -25,15 +38,15 @@ variable "iam_group_membership_name" {
 
 variable "iam_users" {
   description = "A map of all users to create"
-  type = string
+  type        = string
   default     = ""
 }
 
 variable "iam_user_policy_name" {
+  type        = string
   description = "name of iam user policy"
-  default     = {}
+  default     = ""
 }
-
 
 variable "iam_user_policy_01" {
   description = "s3 full access user policy"
@@ -50,20 +63,32 @@ variable "create_iam_ssm_pm" {
 }
 
 variable "iam_role_policy_templates" {
-  type = map
+  type        = map(any)
   description = "map of the role policy templates to create"
-  default = {}
+  default     = {}
 }
 
 variable "iam_user_policy_templates" {
-  type = map
+  type        = map(any)
   description = "map of the uwer policy templates to create"
-  default = {}
+  default     = {}
 }
 variable "iam_group_policy_templates" {
-  type = map
+  type        = map(any)
   description = "map of the group policy templates to create"
-  default = {}
+  default     = {}
+}
+
+variable "iam_role_01_policy_01_arn" {
+  type        = string
+  description = "map of the group policy templates to create"
+  default     = ""
+}
+
+variable "iam_role_01_policy_02_arn" {
+  type        = string
+  description = "map of the group policy templates to create"
+  default     = ""
 }
 
 # ===================================================================================================================
@@ -73,30 +98,37 @@ variable "iam_group_policy_templates" {
 # IAM groups
 # -------------------------------------------------------------------------------------------------------------------
 resource "aws_iam_group" "mobilise_academy_group" {
-  count    = var.create_iam_user ? 1 : 0
-  name     = var.iam_groups
+  count = var.create_iam_user ? 1 : 0
+  name  = var.iam_groups
 }
 
 resource "aws_iam_group_policy" "iam_group_policy" {
-  for_each = var.iam_group_policies
-  name     = lookup(each.value, "group_name", "")
-  policy   = file("./templates/workshop_s3_deny_delete.json")
-  group    = lookup(each.value, "iam_groups", "")
+  count  = var.create_iam_user == true ? 1 : 0
+  name   = var.iam_group_policy
+  policy = file("./templates/policies/workshop_s3_deny_delete.json")
+  group  = var.iam_groups
 }
 
 # -------------------------------------------------------------------------------------------------------------------
 # IAM Users and their group membership
 # -------------------------------------------------------------------------------------------------------------------
 resource "aws_iam_user" "mobilise_academy" {
-  count    = var.create_iam_user ? 1 : 0
-  name     = var.iam_users
+  count = var.create_iam_user ? 1 : 0
+  name  = var.iam_users
+
+    tags = merge(
+    local.default_tags,
+    {
+      "Name" = "mobilise-academy-user"
+    },
+  )
 }
 
 resource "aws_iam_user_policy" "s3_full_access" {
-  count = var.create_iam_user ? 1 : 0
-  name     = var.iam_user_policy_name
-  user     = var.iam_users
-  policy   = data.template_file.s3_full_access_policy_template
+  count  = var.create_iam_user ? 1 : 0
+  name   = var.iam_user_policy_name
+  user   = var.iam_users
+  policy = file("./templates/policies/s3_full_access.json")
 }
 resource "aws_iam_user_group_membership" "mobiliseacademygroup_membership" {
   count  = var.create_iam_user ? 1 : 0
@@ -108,21 +140,54 @@ resource "aws_iam_user_group_membership" "mobiliseacademygroup_membership" {
 # -------------------------------------------------------------------------------------------------------------------
 # Roles
 # -------------------------------------------------------------------------------------------------------------------
+resource "aws_iam_instance_profile" "academy_iam_instance_profile" {
+  count = var.create_iam_user ? 1 : 0
+  name  = var.iam_role_01_name
+  role  = aws_iam_role.instance_iam_role[0].name
+}
+
 resource "aws_iam_role" "instance_iam_role" {
-  name               = "instance-iam-role"
-  assume_role_policy = file("./templates/s3_full_access.json")
+  count              = var.create_iam_user ? 1 : 0
+  name               = var.iam_role_01_name
+  assume_role_policy = file("./templates/policies/assume_role.json")
 
 
-  tags = {
-    tag-key = "tag-value"
-  }
+  tags = merge(
+    local.default_tags,
+    {
+      "Name" = "iam-instance-profile"
+    },
+  )
 }
 # -------------------------------------------------------------------------------------------------------------------
 # Policies
 # -------------------------------------------------------------------------------------------------------------------
-resource "aws_iam_role_policy" "ssm_policy" {
+resource "aws_iam_policy" "ssm_policy" {
   for_each = var.iam_role_policy_templates
-  name   = lookup(each.value, "name", "")
-  role   = aws_iam_role.instance_iam_role.id
-  policy = file("./templates/ssm_managed_instance_core.json")
+  name     = lookup(each.value, "name", "")
+  policy   = file("./templates/policies/ssm_managed_instance_core.json")
+
+  tags = merge(
+    local.default_tags,
+    {
+      "Name" = "ssm-managed-instance-core"
+    },
+  )
+  }
+
+# -------------------------------------------------------------------------------------------------------------------
+# Policy Attachments
+# -------------------------------------------------------------------------------------------------------------------
+resource "aws_iam_role_policy_attachment" "ssmmanagedinstancecore" {
+  count      = var.create_iam_user ? 1 : 0
+  role       = aws_iam_role.instance_iam_role[0].id
+  policy_arn = var.iam_role_01_policy_01_arn
+  depends_on = [aws_iam_role.instance_iam_role]
 }
+resource "aws_iam_role_policy_attachment" "cloudwatchagentserver" {
+  count      = var.create_iam_user ? 1 : 0
+  role       = aws_iam_role.instance_iam_role[0].id
+  policy_arn = var.iam_role_01_policy_02_arn
+  depends_on = [aws_iam_role.instance_iam_role]
+}
+

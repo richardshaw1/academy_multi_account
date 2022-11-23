@@ -1,13 +1,12 @@
 # ===================================================================================================================
-# NAT Gateway - The count is determined by a search for
-# a certain substring in the subnet name. So use this in the tfvars to control what NAT gateway is created.
+# NAT Gateway
 # ===================================================================================================================
 # ======================================================================================================================
 # Variables
 # ======================================================================================================================
 
 variable "create_ngw" {
-  description = "Creates NAT Gateways"
+  description = "Creates NAT Gateway"
   default     = false
 }
 

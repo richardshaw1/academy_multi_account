@@ -1,78 +1,141 @@
-resource "aws_s3_bucket" "assets" {
-  bucket = "assets.rs.mobilise.academy"
+# =========================================================================================================================
+# s3 variables
+# =========================================================================================================================
+variable "create_s3" {
+  type        = bool
+  description = "creates s3 bucket"
+  default     = false
+}
 
-  tags = {
-    Name    = "mobilise-academy"
-    project = "Workshop"
-  }
+variable "s3_bucket_name" {
+  type        = string
+  description = "s3 bucket name"
+  default     = ""
+}
+
+variable "s3_bucket_ac" {
+  type        = string
+  description = "s3 bucket assets control rule"
+  default     = ""
+}
+
+variable "s3_bucket_versioning" {
+  type        = string
+  description = "s3 bucket versioning"
+  default     = ""
+}
+
+variable "s3_bucket_sse" {
+  type        = string
+  description = "s3 bucket sse"
+  default     = ""
+}
+
+variable "s3_bucket_hostname" {
+  type        = string
+  description = "s3 bucket hostname"
+  default     = ""
+}
+
+variable "s3_bucket_protocol" {
+  type        = string
+  description = "s3 bucket protocol"
+  default     = ""
+}
+
+variable "s3_bucket_object_key" {
+  type        = string
+  description = "s3 bucket object key"
+  default     = ""
+}
+
+variable "s3_bucket_object_source" {
+  type        = string
+  description = "s3 bucket object source"
+  default     = ""
+}
+
+# =========================================================================================================================
+# resource creation
+# =========================================================================================================================
+# -------------------------------------------------------------------------------------------------------------------------
+# s3 bucket
+# -------------------------------------------------------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "assets" {
+  count         = var.create_s3 ? 1 : 0
+  bucket        = var.s3_bucket_name
+  force_destroy = true
+
+
+  tags = merge(
+    local.default_tags,
+    {
+      Name    = var.s3_bucket_name
+      project = "workshop"
+    },
+  )
+}
+
+resource "aws_s3_bucket_policy" "assets_policy" {
+  count  = var.create_s3 ? 1 : 0
+  bucket = aws_s3_bucket.assets[0].id
+  policy = file("./templates/policies/assets_bucket.json")
 }
 
 resource "aws_s3_bucket_ownership_controls" "assets" {
-  bucket = aws_s3_bucket.assets.id
+  count  = var.create_s3 ? 1 : 0
+  bucket = aws_s3_bucket.assets[0].id
 
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = var.s3_bucket_ac
   }
 }
 
-/* resource "aws_s3_bucket_acl" "assets" {
-  bucket = assets.rs.mobilise.academy.assets.id
-  acl = "public-read-write"
-} */
-
 resource "aws_s3_bucket_public_access_block" "assets" {
-  bucket              = aws_s3_bucket.assets.id
+  count               = var.create_s3 ? 1 : 0
+  bucket              = aws_s3_bucket.assets[0].id
   block_public_acls   = false
   block_public_policy = false
 }
 
 resource "aws_s3_bucket_versioning" "assets_versioning" {
-  bucket = aws_s3_bucket.assets.id
+  count  = var.create_s3 ? 1 : 0
+  bucket = aws_s3_bucket.assets[0].id
   versioning_configuration {
-    status = "Enabled"
+    status = var.s3_bucket_versioning
   }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "assets_sse" {
-  bucket = aws_s3_bucket.assets.bucket
+  count  = var.create_s3 ? 1 : 0
+  bucket = aws_s3_bucket.assets[0].bucket
 
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      sse_algorithm = var.s3_bucket_sse
     }
   }
 }
 
 resource "aws_s3_object" "object" {
-  bucket = "assets.rs.mobilise.academy"
-  key    = "aws-certfied-cloud-practitioner"
-  source = "/Users/richardshaw/Downloads/aws-certified-cloud-practitioner.png"
+  count = var.create_s3 ? 1 : 0
+
+  bucket = var.s3_bucket_name
+  key    = var.s3_bucket_object_key
+  source = var.s3_bucket_object_source
 
   depends_on = [
     aws_s3_bucket.assets
   ]
 }
 
-
-resource "aws_s3_bucket_policy" "allow_object_access_from_internet" {
-  bucket = aws_s3_bucket.assets.id
-  policy = file("./templates/assets_bucket.json")
-}
-
 resource "aws_s3_bucket_website_configuration" "assets" {
-  bucket = aws_s3_bucket.assets.bucket
+  count  = var.create_s3 ? 1 : 0
+  bucket = aws_s3_bucket.assets[0].bucket
   redirect_all_requests_to {
-    host_name = "https://assets.rs.mobilise.academy.s3-website.eu-west-2.amazonaws.com"
-    protocol  = "http"
-  }
-}
-
-resource "aws_s3_bucket_website_configuration" "assets_web_conf" {
-  bucket = aws_s3_bucket.assets.bucket
-
-  redirect_all_requests_to {
-    host_name = "https://assets.rs.mobilise.academy.s3-website.eu-west-2.amazonaws.com/"
-    protocol  = "https"
+    host_name = var.s3_bucket_hostname
+    protocol  = var.s3_bucket_protocol
   }
 }

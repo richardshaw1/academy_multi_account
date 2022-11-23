@@ -27,19 +27,14 @@ resource "aws_instance" "instance_standard" {
   private_ip                  = lookup(each.value, "private_ip", "")
   associate_public_ip_address = lookup(each.value, "associate_public_ip_address", false)
   key_name                    = lookup(each.value, "ec2_account_key_name")
-  vpc_security_group_ids      = lookup(each.value, "sg_names")
-  iam_instance_profile        = lookup(each.value, "iam_instance_profile", "") == "" ? "" : "${lookup(each.value, "iam_instance_profile", "")}-iam-ip"
-  disable_api_termination     = lookup(each.value, "disable_api_termination", null)
-  monitoring                  = lookup(each.value, "monitoring", null)
+  vpc_security_group_ids      = [for sg in lookup(each.value, "sg_names", []) : aws_security_group.ec2_sg[sg].id]
+  iam_instance_profile        = lookup(each.value, "iam_instance_profile", null) != null ? lookup(each.value, "iam_instance_profile", "") : null
   user_data                   = lookup(each.value, "user_data", null) != null ? templatefile("${path.module}/${lookup(each.value, "user_data", "")}", {}) : null
 
   tags = merge(
     local.default_tags,
     {
-
-      "Name"    = "${local.name_prefix}-${lookup(each.value, "tag_name", "")}"
-      "Owner"   = lookup(each.value, "tag_owner", "")
-      "Project" = lookup(each.value, "tag_project", "")
+      "Name" = lookup(each.value, "tag_name", "")
     },
   )
 }

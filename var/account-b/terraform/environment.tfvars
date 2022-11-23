@@ -2,8 +2,8 @@
 # Environment Specific Variables
 # -------------------------------------------------------------------------------------------------------------------
 
-client_abbr = "Mob"
+client_abbr = "mob"
 account_no  = "226283484947"
-environment = "Account-B"
-owner       = "mobilise"
-project     = "Workshop"
+environment = "account-b"
+owner       = "mobilise-rs"
+project     = "mobilise-academy-workshop"

@@ -11,6 +11,18 @@ subnet_names = {
   "3" = "tgw-A"
   "4" = "tgw-B"
 }
+
+subnet_cidrs = {
+  # public Subnets for EC2 Squid Proxies + Bastion Host
+  "0" = "10.2.0.0/27"
+  "1" = "10.2.0.32/27"
+  # public Subnet for NAT Gateway
+  "2" = "10.2.0.64/27"
+  # public Subnets for Transit Gateway
+  "3" = "10.2.0.96/27"
+  "4" = "10.2.0.128/27"
+}
+
 environment_azs = {
   # public Subnets for EC2 Squid Proxies + Bastion Host
   "0" = "a"
@@ -20,6 +32,8 @@ environment_azs = {
   # public Subnets for Transit Gateway
   "3" = "a"
   "4" = "b"
+<<<<<<< HEAD
+  "5" = "c"
 }
 subnet_cidrs = {
   # public Subnets for EC2 Squid Proxies + Bastion Host
@@ -41,3 +55,6 @@ subnet_tags = {
   "4" = [""]
 }
 
+=======
+}
+>>>>>>> origin/main

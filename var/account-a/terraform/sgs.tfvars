@@ -24,22 +24,40 @@ sgs = {
 # ######################################################################################################################
 # INBOUND - TCP, Single Port, CIDR range
 # ######################################################################################################################
-  inbound_rules_tcp_sp_cidr = {
+inbound_rules_tcp_sp_cidr = {
   # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_cidr - ssh_from_internet_my_ip
   # -----------------------------------------------------------------------------------------------------------------
-  "ssh_from_internet_my_ip" = {
+  "ssh_from_internet_my_ip_01" = {
     "port"        = 22
     "description" = "SSH from Internet from my IP"
     "my_sg"       = "ssh_from_internet"
     "cidr_blocks" = ["86.142.13.136/32"]
   }
-  "ssh_from_internet_my_ip" = {
+  "ssh_from_internet_my_ip_02" = {
     "port"        = 22
     "description" = "SSH from Internet from my IP"
     "my_sg"       = "ssh_from_internet"
-    "cidr_blocks" = ["86.142.13.136/32"]
-}
+    "cidr_blocks" = ["35.176.70.124/32"]
+  }
+  "ssh_from_internet_my_ip_03" = {
+    "port"        = 22
+    "description" = "SSH from Internet from my IP"
+    "my_sg"       = "ssh_from_internet"
+    "cidr_blocks" = ["86.140.132.22/32"]
+  }
+  "ssh_from_internet_my_ip_04" = {
+    "port"        = 22
+    "description" = "SSH from Internet from my IP"
+    "my_sg"       = "ssh_from_internet"
+    "cidr_blocks" = ["18.130.118.169/32"]
+  }
+  "ssh_from_internet_my_ip_05" = {
+    "port"        = 22
+    "description" = "SSH from Internet from my IP"
+    "my_sg"       = "ssh_from_internet"
+    "cidr_blocks" = ["86.138.98.169/32"]
+  }
   # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_cidr - squid_sg
   # -----------------------------------------------------------------------------------------------------------------
@@ -47,15 +65,15 @@ sgs = {
     "port"        = 22
     "description" = "SSH Ingress from Bastion Host"
     "my_sg"       = "squid_sg"
-    "cidr_blocks" = ["10.0.0.8/32"]
+    "cidr_blocks" = ["10.2.0.20/32"]
   }
-    "squid_sg_80" = {
+  "squid_sg_80" = {
     "port"        = 80
     "description" = "HTTP from internet"
     "my_sg"       = "squid_sg"
     "cidr_blocks" = ["0.0.0.0/0"]
   }
-    "squid_sg_443" = {
+  "squid_sg_443" = {
     "port"        = 443
     "description" = "HTTPS from internet"
     "my_sg"       = "squid_sg"
@@ -64,10 +82,34 @@ sgs = {
   # -----------------------------------------------------------------------------------------------------------------
   # Ingress tcp_sp_cidr - ssm_endpoint_sg
   # -----------------------------------------------------------------------------------------------------------------
-    "ssm_endpoint_443" = {
+  "ssm_endpoint_443" = {
     "port"        = 443
     "description" = "HTTPS from VPC-A"
     "my_sg"       = "ssm_endpoint_sg"
-    "cidr_blocks" = ["10.0.0.0/16"]
+    "cidr_blocks" = ["10.2.0.0/16"]
+  }
+}
+
+# ######################################################################################################################
+# outbound - egress all security groups
+# ######################################################################################################################
+egress_all = {
+  # -----------------------------------------------------------------------------------------------------------------
+  # egress all - bastion_sg
+  # -----------------------------------------------------------------------------------------------------------------
+  "bastion_sg_egress_all" = {
+    "my_sg" = "ssh_from_internet"
+  }
+  # --------------------------------------------------------------------------------------------------------------------
+  # egress all - ssm_endpnt_sg
+  # --------------------------------------------------------------------------------------------------------------------
+  "ssm_endpnt_sg_egress_all" = {
+    "my_sg" = "ssm_endpoint_sg"
+  }
+  # --------------------------------------------------------------------------------------------------------------------
+  # egress all - squid_sg
+  # --------------------------------------------------------------------------------------------------------------------
+  "squid_sg_egress_all" = {
+    "my_sg" = "squid_sg"
   }
 }

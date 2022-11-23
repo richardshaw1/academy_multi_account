@@ -4,6 +4,6 @@
 
 client_abbr = "mob"
 account_no  = "784943245565"
-environment = "account-A"
-owner       = "Mob-academy"
-project     = "Workshop"
+environment = "account-a"
+owner       = "mobilise-rs"
+project     = "mobilise-academy-workshop"

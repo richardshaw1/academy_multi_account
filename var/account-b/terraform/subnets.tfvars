@@ -13,11 +13,11 @@ subnet_names = {
 
 subnet_cidrs = {
   # Private APP Subnets for Wordpress EC2
-  "0" = "10.1.0.0/27"
-  "1" = "10.1.0.32/27"
+  "0" = "10.3.0.0/27"
+  "1" = "10.3.0.32/27"
   # Private DATA Subnets for Databases
-  "2" = "10.1.0.64/27"
-  "3" = "10.1.0.96/27"
+  "2" = "10.3.0.64/27"
+  "3" = "10.3.0.96/27"
 }
 
 environment_azs = {
@@ -27,11 +27,4 @@ environment_azs = {
   # Private DATA Subnets for Databases
   "2" = "a"
   "3" = "b"
-}
-
-subnet_tags = {
-  "0" = ""
-  "1" = ""
-  "2" = ""
-  "3" = ""
 }
