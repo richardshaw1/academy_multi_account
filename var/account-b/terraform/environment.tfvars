@@ -3,7 +3,7 @@
 # -------------------------------------------------------------------------------------------------------------------
 
 client_abbr = "mob"
-account_no  = "226283484947"
+account_no  = ""
 environment = "account-b"
 owner       = "mobilise-rs"
 project     = "mobilise-academy-workshop"
