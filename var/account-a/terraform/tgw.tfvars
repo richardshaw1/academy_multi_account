@@ -15,7 +15,7 @@ tgw_default_route_table_association = false
 tgw_default_route_table_propagation = false
 transit_gateway_asn                 = "64515"
 tgw_x_filter_name                   = "vpc-id"
-ram_name                            = "mob-academy-resource-share"
+ram_name                            = "academy-resource-share"
 
 tgw_vpc_attachments = {
   "account-b" = "vpc-0b919059bbec3d6ae"
