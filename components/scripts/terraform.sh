@@ -28,25 +28,19 @@ function output_command() {
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 environment=${1}
 action=${2}
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
 if [[ "${action}" == "import" ]]; then
   tf_resource=${3} # Used for TF import
   tf_resource_id=${4} # Used for TF import
 fi
-<<<<<<< HEAD
 
 if [[ "${action}" == "remove" ]]; then
   tf_resource_address=${3} # Used for TF state remove
 fi
 
-=======
 if [[ "${action}" == "remove" ]]; then
   tf_resource_address=${3} # Used for TF state remove
 fi
->>>>>>> origin/main
 shift 2
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # tfenv
@@ -163,10 +157,7 @@ tf_import="terraform -chdir=\"${tf_dir}\" import ${var_file_params} '${tf_resour
 tf_state_list="terraform state list"
 tf_state_rm="terraform -chdir=\"${tf_dir}\" state rm '${tf_resource_address:-}'"
 tf_state_mv="terraform -chdir=\"${tf_dir}\" state mv '${tf_resource_address_from:-}' '${tf_resource_address_to:-}'"
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
 combine_tf_action(){
   echo "THIS IS 1 ${1}"
   combined_dir="${parent_dir}/.tf_combined_tmp"
@@ -186,11 +177,7 @@ if [[ "${action}" == "plan" ]]; then
 fi
 output_command "INITIATING BACKEND:" "${tf_init}"
 eval "${tf_init}"
-<<<<<<< HEAD
-# -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-=======
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------
->>>>>>> origin/main
 # Terraform Plan
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 if [[ "${action}" == "plan" ]]; then
